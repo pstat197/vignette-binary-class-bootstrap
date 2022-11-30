@@ -1,0 +1,73 @@
+---
+title: "Data Cleaning"
+author: "Luke Fields (8385924)"
+date: "`r format(Sys.Date(), 'November 28, 2022')`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+Below are the packages and libraries we are using in this assignment. 
+  
+```{r setup, message = FALSE}
+library(corrplot)
+library(klaR) 
+library(knitr)
+library(MASS)
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library("dplyr")
+library("yardstick")
+library(stringr)
+tidymodels_prefer()
+student_mh <- read_csv("/Users/lukefields/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mental_health.csv")
+knitr::opts_chunk$set(
+	echo = TRUE,
+	fig.height = 5,
+	fig.width = 7,
+	tidy = TRUE,
+	tidy.opts = list(width.cutoff = 60)
+)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+options(digits = 4)
+## indents are for indenting r code as formatted text
+## They may need to be adjusted depending on your OS
+# if your output looks odd, increase or decrease indent
+indent1 = '    '
+indent2 = '        '
+indent3 = '            '
+```
+
+Before we begin working with our model, we will factorize the survived and pclass variables first, making sure that "Yes" is the first level in our data set. 
+
+
+First, do some string manipulation on year and then turn that column into a factor
+```{r}
+student_mh <- select(student_mh, -Timestamp)
+student_mh$Year <- str_sub(student_mh$Year, -1)
+student_mh$Year <- as.numeric(student_mh$Year)
+student_mh
+```
+Also, we do not need timestamp for this assignment
+
+Next, make factors of certain categorical variables
+```{r}
+student_mh_clean <- student_mh %>%
+  mutate(Married = factor(Married, levels = c("Yes", "No")),
+         Depression = factor(Depression, levels = c("Yes", "No")),
+         Anxiety = factor(Anxiety, levels = c("Yes", "No")),
+         Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
+         Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
+
+write_csv(student_mh_clean, "~/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mh_clean.csv")
+```
+
+
+```{r}
+student_mh_clean %>%
+  head()
+```
+
+

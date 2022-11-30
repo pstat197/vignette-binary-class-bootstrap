@@ -22,7 +22,7 @@ library("dplyr")
 library("yardstick")
 library(stringr)
 tidymodels_prefer()
-student_mh <- read_csv("/Users/lukefields/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mental_health.csv")
+student_mh_clean <- read_csv("/Users/lukefields/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mh_clean.csv")
 knitr::opts_chunk$set(
 	echo = TRUE,
 	fig.height = 5,
@@ -40,39 +40,10 @@ indent2 = '        '
 indent3 = '            '
 ```
 
-Before we begin working with our model, we will factorize the survived and pclass variables first, making sure that "Yes" is the first level in our data set. 
-
-
-Create a function that does our string manipiulation
-```{r}
-student_mh <- read_csv("/Users/lukefields/Desktop/student_mental_health.csv")
-
-student_mh <- select(student_mh, -Timestamp)
-student_mh$Year <- str_sub(student_mh$Year, -1)
-student_mh$Year <- as.numeric(student_mh$Year)
-student_mh
-```
-
-Married
-Depression
-Anxiety
-Panic_Attack
-Seek_Help
-
-```{r}
-student_mh <- student_mh %>%
-  mutate(Married = factor(Married, levels = c("Yes", "No")),
-         Depression = factor(Depression, levels = c("Yes", "No")),
-         Anxiety = factor(Anxiety, levels = c("Yes", "No")),
-         Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
-         Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
-
-student_mh
-```
-
+Let's do some model building with logistic regression
 ```{r}
 set.seed(912)
-student_mh_dep_split <- initial_split(student_mh, 
+student_mh_dep_split <- initial_split(student_mh_clean, 
                                prop = 0.7, strata = Depression)
 student_mh_dep_train <- training(student_mh_dep_split)
 student_mh_dep_test <- testing(student_mh_dep_split)
@@ -111,7 +82,7 @@ Depression at like an 80.65% accuracy.
 
 ```{r}
 set.seed(912)
-student_mh_anx_split <- initial_split(student_mh, 
+student_mh_anx_split <- initial_split(student_mh_clean, 
                                prop = 0.7, strata = Anxiety)
 student_mh_anx_train <- training(student_mh_anx_split)
 student_mh_anx_test <- testing(student_mh_anx_split)
@@ -132,8 +103,10 @@ student_mh_anx_log_wf <- workflow() %>%
 
 student_mh_anx_fit <- fit(student_mh_anx_log_wf, student_mh_anx_train)
 
-student_mh_anx_pred <- predict(student_mh_anx_fit, new_data = student_mh_anx_test, type = "class") %>% 
+student_mh_anx_pred <- predict(student_mh_anx_fit, new_data = student_mh_anx_test, type = "class") %>%
   bind_cols(student_mh_anx_test) 
+
+student_mh_anx_pred
 
 student_mh_anx_acc <- student_mh_anx_pred %>% 
   accuracy(truth = Anxiety, estimate = .pred_class)
