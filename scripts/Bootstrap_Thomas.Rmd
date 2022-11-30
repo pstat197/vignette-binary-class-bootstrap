@@ -1,0 +1,45 @@
+---
+title: "BootStrap"
+output:
+  html_document: default
+  pdf_document: default
+date: "2022-11-30"
+---
+
+
+
+**Bootstrap method**
+
+Bootstrap is a technique to estimate quantities about population by averaging estimate from multiple small samples. We will try to use this method to improve the accuracy of our model
+
+**Sampling with replacement**
+
+The simplest and most command bootstrap method is sampling with replacement. We randomly draw observations from the original sample and return them one at a time to form a new sample. Suppose we have $n$ samples; then the probability of an individual being drew is $1/n$. Then the probability of not be drawing is $1-1/n$. Then if we draw individual $n$ times, the probability of an individual not being drew 
+is $(1-1/n)^n$. As $n$ approaches to infinity, the probability will converge to $\mathrm{e}^{-1}$. Therefore, the new sample will captured $1-\mathrm{e}^{-1}$ of the original sample.
+
+**Function of Replace Method**
+We will use sample function to construct a function for Replace Method
+$sample(x, size, replace, prob)$
+The first argument is a vector containing the data set to be resampled or the indices of the data to be resampled. The size option specifies the sample size with the default being the size of the population being resampled. The replace option determines if the sample will be drawn with or without replacement where the default value is FALSE, i.e. without replacement. The prob option takes a vector of length equal to the data set given in the first argument containing the probability of selection for each element of x. The default value is for a random sample where each element has equal probability of being sampled. In a typical bootstrapping situation we would want to obtain bootstrapping samples of the same size as the population being sampled and we would want to sample with replacement.
+$i$ is the numbers of samples. $df$ is the original dataframe
+```{r}
+Replace <- function(i, df){
+  indx <- c(sample(nrow(df)), i, replace = TRUE)
+  df2 <- data.frame(c(df[indx[0], ]), row.names = colnames(df))
+  for (a in range(length(index)-1)){
+    df2[nrow(df2) + 1,] = c(df[indx[a],])
+  }
+  return (df2)
+}
+```
+
+Or we can use packages, $resample$ and $tidyverse$ to perform bootstrapping.
+```{r}
+library(tidyverse)
+library(rsample)
+bootstrap <- function(i, df){
+  bt_samples <- bootstraps(df, times = i)
+}
+```
+
+
