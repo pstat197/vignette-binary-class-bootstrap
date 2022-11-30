@@ -22,7 +22,6 @@ library("dplyr")
 library("yardstick")
 library(stringr)
 tidymodels_prefer()
-student_mh_clean <- read_csv("/Users/lukefields/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mh_clean.csv")
 knitr::opts_chunk$set(
 	echo = TRUE,
 	fig.height = 5,
@@ -40,11 +39,24 @@ indent2 = '        '
 indent3 = '            '
 ```
 
+```{r}
+set.seed(1040)
+student_mh_clean <- read_csv("/Users/lukefields/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mh_clean.csv")
+
+student_mh_clean <- student_mh_clean %>%
+  mutate(Married = factor(Married, levels = c("Yes", "No")),
+         Depression = factor(Depression, levels = c("Yes", "No")),
+         Anxiety = factor(Anxiety, levels = c("Yes", "No")),
+         Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
+         Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
+
+```
+
+
 Let's do some model building with logistic regression
 ```{r}
-set.seed(912)
 student_mh_dep_split <- initial_split(student_mh_clean, 
-                               prop = 0.7, strata = Depression)
+                               prop = 0.6, strata = Depression)
 student_mh_dep_train <- training(student_mh_dep_split)
 student_mh_dep_test <- testing(student_mh_dep_split)
 
@@ -75,13 +87,11 @@ student_mh_dep_pred <- student_mh_dep_pred %>%
 
 student_mh_dep_pred
 
-
 student_mh_dep_acc
 ```
 Depression at like an 80.65% accuracy. 
 
 ```{r}
-set.seed(912)
 student_mh_anx_split <- initial_split(student_mh_clean, 
                                prop = 0.7, strata = Anxiety)
 student_mh_anx_train <- training(student_mh_anx_split)
@@ -106,7 +116,6 @@ student_mh_anx_fit <- fit(student_mh_anx_log_wf, student_mh_anx_train)
 student_mh_anx_pred <- predict(student_mh_anx_fit, new_data = student_mh_anx_test, type = "class") %>%
   bind_cols(student_mh_anx_test) 
 
-student_mh_anx_pred
 
 student_mh_anx_acc <- student_mh_anx_pred %>% 
   accuracy(truth = Anxiety, estimate = .pred_class)
