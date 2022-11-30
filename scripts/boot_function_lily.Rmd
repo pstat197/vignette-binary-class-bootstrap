@@ -1,0 +1,42 @@
+```{r}
+library(boot)
+# function to obtain accuracy from logistic regression
+acc_f <- function(formula, data, i) {
+  d2 <- data[i,]
+  d2_split <- initial_split(d2, prop = 0.7, strata = Anxiety)
+  d2_train <- training(d2_split)
+  d2_test <- testing(d2_split)
+  
+  recipe <- 
+    recipe(Depression ~ ., d2_train) %>%
+    step_rm(Major) %>%
+    step_rm(Anxiety) %>%
+    step_dummy(all_nominal_predictors())
+
+  log_reg <- logistic_reg() %>% 
+    set_engine("glm") %>% 
+    set_mode("classification")
+
+  wf <- workflow() %>% 
+    add_model(log_reg) %>% 
+    add_recipe(recipe)
+
+  fit <- fit(wf, d2_train)
+
+  pred <- predict(fit, new_data = d2_test, type = "class") %>% 
+    bind_cols(d2_test) 
+
+  acc <- pred %>% accuracy(truth = Depression, estimate = .pred_class)
+  
+  return (acc[3] %>% as.numeric())
+}
+
+# bootstrapping with 1000 replications
+results <- boot(data=student_mh, statistic=acc_f,R=1000, formula=Depression ~ .)
+
+results
+plot(results)
+
+# 95% confidence interval
+boot.ci(results, type="bca")
+```
