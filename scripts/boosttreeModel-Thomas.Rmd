@@ -1,0 +1,73 @@
+---
+title: "Broost-Tree"
+output: html_document
+date: "2022-11-30"
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(MASS)
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library("dplyr")
+library("yardstick")
+library(stringr)
+library(xgboost
+)
+```
+**Data Cleaning**
+```{r}
+student_mh <- read.csv("C:/Pstat 197A/vignette-binary-class-bootstrap/data/student_mental_health.csv")
+
+student_mh <- select(student_mh, -Timestamp)
+student_mh$Year <- str_sub(student_mh$Year, -1)
+student_mh$Year <- as.numeric(student_mh$Year)
+
+student_mh <- student_mh %>%
+  mutate(Married = factor(Married, levels = c("Yes", "No")),
+         Depression = factor(Depression, levels = c("Yes", "No")),
+         Anxiety = factor(Anxiety, levels = c("Yes", "No")),
+         Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
+         Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
+
+
+student_mh <- select(student_mh, -3)
+student_mh
+```
+
+**split to test set and training set**
+```{r}
+set.seed(1130)
+student_mh_split <- student_mh %>% initial_split(strata = Depression, prop = 0.7)
+student_mh_train <- training(student_mh_split)
+student_mh_test <- testing(student_mh_split)
+```
+
+**fit the broost treet model**
+```{r}
+boost_tree_model <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+boost_recipe <- 
+  recipe(Depression ~ ., data = student_mh_train) %>%
+  step_rm(Anxiety) %>%
+  step_dummy(all_nominal_predictors())
+boost_wkf <- workflow() %>% 
+  add_model(boost_tree_model) %>%
+  add_recipe(boost_recipe)
+
+boost_tree_fit <- fit(boost_wkf, student_mh_train)
+```
+**Accuracy**
+```{r}
+boost_pred <- predict(boost_tree_fit, new_data = student_mh_test, type = "class") %>% 
+  bind_cols(student_mh_test) 
+
+student_mh_acc <- boost_pred %>% 
+  accuracy(truth = Depression, estimate = .pred_class)
+
+student_mh_acc
+```
+
+The accuracy is also 80.65%
