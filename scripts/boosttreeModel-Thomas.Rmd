@@ -39,7 +39,7 @@ student_mh
 **split to test set and training set**
 ```{r}
 set.seed(1130)
-student_mh_split <- student_mh %>% initial_split(strata = Depression, prop = 0.7)
+student_mh_split <- student_mh %>% initial_split(strata = Depression, prop = 0.6)
 student_mh_train <- training(student_mh_split)
 student_mh_test <- testing(student_mh_split)
 ```
@@ -70,4 +70,4 @@ student_mh_acc <- boost_pred %>%
 student_mh_acc
 ```
 
-The accuracy is also 80.65%
+The accuracy is also 85.36%
