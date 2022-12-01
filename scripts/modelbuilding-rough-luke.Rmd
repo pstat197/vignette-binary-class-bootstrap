@@ -128,6 +128,73 @@ student_mh_anx_pred
 student_mh_anx_acc
 ```
 
+
+
+
+Trying out Thomas' boosted tree model on Anxiety
+```{r}
+set.seed(117)
+student_mh_split <- student_mh_clean %>% initial_split(strata = Anxiety, prop = 0.6)
+student_mh_train <- training(student_mh_split)
+student_mh_test <- testing(student_mh_split)
+
+boost_tree_model <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+boost_recipe <- 
+  recipe(Anxiety ~ ., data = student_mh_train) %>%
+  step_rm(Depression) %>%
+  step_dummy(all_nominal_predictors())
+boost_wkf <- workflow() %>% 
+  add_model(boost_tree_model) %>%
+  add_recipe(boost_recipe)
+
+boost_tree_fit <- fit(boost_wkf, student_mh_train)
+
+boost_pred <- predict(boost_tree_fit, new_data = student_mh_test, type = "class") %>% 
+  bind_cols(student_mh_test) 
+
+student_mh_acc <- boost_pred %>% 
+  accuracy(truth = Anxiety, estimate = .pred_class)
+
+student_mh_acc
+```
+63% accuracy for anxiety
+
+Trying out Thomas' boosted tree model on Seek help
+```{r}
+set.seed(117)
+student_mh_split <- student_mh_clean %>% initial_split(strata = Seek_Help, prop = 0.6)
+student_mh_train <- training(student_mh_split)
+student_mh_test <- testing(student_mh_split)
+
+boost_tree_model <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+boost_recipe <- 
+  recipe(Anxiety ~ ., data = student_mh_train) %>%
+  step_rm(Depression) %>%
+  step_dummy(all_nominal_predictors())
+boost_wkf <- workflow() %>% 
+  add_model(boost_tree_model) %>%
+  add_recipe(boost_recipe)
+
+boost_tree_fit <- fit(boost_wkf, student_mh_train)
+
+boost_pred <- predict(boost_tree_fit, new_data = student_mh_test, type = "class") %>% 
+  bind_cols(student_mh_test) 
+
+student_mh_acc <- boost_pred %>% 
+  accuracy(truth = Seek_Help, estimate = .pred_class)
+
+student_mh_acc
+```
+
+
+
+
+
+Lily's boot
 ```{r}
 library(boot)
 # function to obtain accuracy from logistic regression
