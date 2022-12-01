@@ -16,6 +16,16 @@ library(stringr)
 library(xgboost
 )
 ```
+**Bootstrap method**
+
+Bootstrap is a technique to estimate quantities about population by averaging estimate from multiple small samples. We will try to use this method to improve the accuracy of our model
+
+**Sampling with replacement**
+
+The simplest and most command bootstrap method is sampling with replacement. We randomly draw observations from the original sample and return them one at a time to form a new sample. Suppose we have $n$ samples; then the probability of an individual being drew is $1/n$. Then the probability of not be drawing is $1-1/n$. Then if we draw individual $n$ times, the probability of an individual not being drew 
+is $(1-1/n)^n$. As $n$ approaches to infinity, the probability will converge to $\mathrm{e}^{-1}$. Therefore, the new sample will captured $1-\mathrm{e}^{-1}$ of the original sample.
+
+In this vignette, we will do a model performance comparison between using the original sample and the bootstrap sample. We choose the boost tree classification model because it has the best performance among all the classification model fitted by us.
 **Data Cleaning**
 ```{r}
 student_mh <- read.csv("C:/Pstat 197A/vignette-binary-class-bootstrap/data/student_mental_health.csv")
@@ -71,3 +81,58 @@ student_mh_acc
 ```
 
 The accuracy is also 85.36%
+
+
+```{r}
+boot <- bootstraps(student_mh, times = 1000)
+boot_result <- fit_resamples(boost_wkf, boot)
+```
+```{r}
+collect_metrics(boot_result)
+```
+**Model to estimate Anxiety**
+```{r}
+anxiety_recipe<- recipe(Anxiety ~ ., data = student_mh_train) %>%
+  step_rm(Depression) %>%
+  step_dummy(all_nominal_predictors())
+
+anxiety_wkf <- workflow() %>% 
+  add_model(boost_tree_model) %>%
+  add_recipe(anxiety_recipe)
+
+
+
+anxiety_fit <- fit(anxiety_wkf, student_mh_train)
+
+
+```
+
+**Accuracy**
+```{r}
+anxiety_pred <- predict(anxiety_fit, new_data = student_mh_test, type = "class") %>% 
+  bind_cols(student_mh_test) 
+
+anxiety_acc <- boost_pred %>% 
+  accuracy(truth = Anxiety, estimate = .pred_class)
+
+anxiety_acc
+```
+
+**Boot Model to estimate Anxiety**
+```{r}
+anxiety_recipe<- recipe(Anxiety ~ ., data = student_mh_train) %>%
+  step_rm(Depression) %>%
+  step_dummy(all_nominal_predictors())
+
+anxiety_wkf <- workflow() %>% 
+  add_model(boost_tree_model) %>%
+  add_recipe(anxiety_recipe)
+
+anxiety_boot <- bootstraps(student_mh, times = 1000)
+anxiety_result <- fit_resamples(anxiety_wkf, boot)
+```
+```{r}
+collect_metrics(anxiety_result)
+```
+
+In conclusion that the boost tree model performed well when we are predicting Depression and performed not as well when we are predicting Anxiety. When we are using bootstrap to draw sample and predict Depression and Anxiety. Both accuracy decreases. I suppose the mean of accuracy across 1000 samples will be a good estimation of accuracy when we use the boost tree model to predict a new data set. 
