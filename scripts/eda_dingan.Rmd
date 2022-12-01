@@ -1,0 +1,120 @@
+---
+title: "mental_health_EDA"
+output: html_document
+date: "2022-11-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+student_mh <- read_csv("student_mental_health.csv")
+
+student_mh <- select(student_mh, -Timestamp)
+student_mh$Year <- str_sub(student_mh$Year, -1)
+student_mh$Year <- as.numeric(student_mh$Year)
+student_mh
+```
+
+```{r}
+student_mh <- student_mh %>%
+  mutate(Married = factor(Married, levels = c("Yes", "No")),
+         Depression = factor(Depression, levels = c("Yes", "No")),
+         Anxiety = factor(Anxiety, levels = c("Yes", "No")),
+         Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
+         Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
+
+student_mh
+```
+
+```{r}
+# barplot
+student_mh %>%
+  ggplot(aes(x = Year, y=GPA, fill=GPA)) +
+  geom_bar(stat = "identity", width=0.8) +
+  # scale_x_continuous(limits=c(20, 80)) +
+  labs(x = "Number of the Student",
+       y = "GPA range",
+       title = "GPA distribution by Depression") +
+  facet_wrap(~Depression)+
+  theme_minimal()
+```
+
+```{r}
+student_mh %>%
+  ggplot(aes(x = Year, y=GPA, fill=GPA)) +
+  geom_bar(stat = "identity", width=0.8) +
+  # scale_x_continuous(limits=c(20, 80)) +
+  labs(x = "Number of the Student",
+       y = "GPA range",
+       title = "GPA distribution by Anxiety") +
+  facet_wrap(~Anxiety)+
+  theme_minimal()
+```
+
+
+```{r}
+student_mh %>%
+    ggplot(aes(x = Age, fill = Anxiety )) +
+    geom_density(alpha = 0.4) +
+    labs(title = "Depression destribution by age",
+  fill = "Depression",
+  x = "Age",
+  y = "Density") + ## and now add labels to each argument of the aes
+theme_minimal()
+```
+
+```{r}
+# corrlation plot
+library(ggcorrplot)
+student_mh1 <- student_mh %>% 
+  select(Year,Married,Depression,Anxiety,Panic_Attack,Seek_Help)
+model.matrix(~0+., data=student_mh1) %>% 
+  cor(use="pairwise.complete.obs") %>% 
+  ggcorrplot(show.diag = T, type="lower", lab=TRUE, lab_size=2)
+```
+
+```{r}
+# student_mh %>%
+#   ggplot(aes(x = Major, y=GPA)) +
+#   geom_bar(stat = "identity", width=0.8) +
+#   labs(x = "Number of the Student",
+#        y = "GPA range",
+#        title = "GPA distribution by Anxiety") +
+#   # facet_wrap(~Anxiety)+
+#   theme_minimal()
+```
+
+
+```{r}
+student_mh %>%
+  ggplot(aes(x = Year, y=Year, fill= Year)) +
+  geom_bar(stat = "identity", width=0.8) +
+  labs(x = "Year",
+       y = "Number of the Student",
+       title = "") +
+  facet_wrap(~Depression)+
+  theme_minimal()
+```
+
+```{r}
+student_mh %>%
+  ggplot(aes(x = Year, y=Year, fill= Year)) +
+  geom_bar(stat = "identity", width=0.8) +
+  labs(x = "Year",
+       y = "Number of the Student",
+       title = "") +
+  facet_wrap(~Anxiety)+
+  theme_minimal()
+```
+
+
+
+
+
+
