@@ -4,10 +4,10 @@ Created as a the Group 9 final module assignment for PSTAT 197A in Fall 2022, th
 
 Group 9 Vignette Contributors:
 
-• Luke Fields
-• Thomas Shi
-• Lily Li
-• Dingan Jiang
+-  *Luke Fields*
+-  *Thomas Shi*
+-  *Lily Li*
+-  *Dingan Jiang*
 
 What we will be doing is taking many bootstrap samples from a dataset comprised of student mental health conditions, and then running individual machine learning models on each bootstrap sample to get a confidence interval of the accuracy. Our dataset is only about 100 observations, so taking bootstrap samples can help us better understand a certain estimate with more confidence; in this case the accuracy of our boosted tree model we implement to each 1000 bootstrap sample. 
 
