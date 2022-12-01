@@ -1,5 +1,5 @@
 # Group 9 Vignette - Binary Classification Bootstrap
-Created as a the Group 9 final module assignment for PSTAT 197A in Fall 2022, this is the template repositroy for a vignette on binary classification bootstrapping using student mental health data.
+Created as a the final module assignment for Group 9 of PSTAT 197A in Fall 2022, this is the template repository for a vignette on binary classification bootstrapping using student mental health data.
 
 
 ## Contributors:
