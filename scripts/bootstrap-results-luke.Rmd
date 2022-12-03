@@ -1,0 +1,111 @@
+We are using 1000 bootstrap samples to provide a 95% confidence interval of prediction accuracies of students with mental illness. By providing a confidence interval, we get an averaged prediction accuracy from 1000 samples that is less bias, and we are able to see a wide range that our prediction accuracy can stretch from. Random forests and other bagging methods utilize bootstrap methods in their algorithms to take take subsets of data with replacement. Therefore, we can try bootstraping to get a better understanding of metrics using other models (logistic regression in this case).
+
+```{r}
+library(boot)
+library(tidyverse)
+library(tidymodels)
+student_mh <- read.csv("/Users/lukefields/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mh_clean.csv")
+
+student_mh <- student_mh %>%
+  mutate(Married = factor(Married, levels = c("Yes", "No")),
+         Depression = factor(Depression, levels = c("Yes", "No")),
+         Anxiety = factor(Anxiety, levels = c("Yes", "No")),
+         Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
+         Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
+
+log_reg <- logistic_reg() %>% 
+    set_engine("glm") %>% 
+    set_mode("classification")
+```
+
+
+First, we'll create a function to obtain accuracy from logistic regression
+```{r}
+acc_dep <- function(formula, data, i) {
+  data_dep <- data[i,]
+  dep_split <- initial_split(data_dep, prop = 0.7, strata = Depression)
+  dep_train <- training(dep_split)
+  dep_test <- testing(dep_split)
+  
+  dep_recipe <- recipe(Depression ~ ., dep_train) %>%
+    step_rm(Major) %>%
+    step_rm(Anxiety) %>%
+    step_dummy(all_nominal_predictors())
+
+  dep_wf <- workflow() %>% 
+    add_model(log_reg) %>% 
+    add_recipe(dep_recipe)
+
+  fit <- fit(dep_wf, dep_train)
+
+  pred_dep <- predict(fit, new_data = dep_test, type = "class") %>% 
+    bind_cols(dep_test) 
+
+  acc_dep <- pred_dep %>% accuracy(truth = Depression, estimate = .pred_class)
+  
+  return (acc_dep[3] %>% as.numeric())
+}
+```
+
+Bootstrapping with 1000 replications gives us an accuracy of 0.8, bias of 0.02677731, and std. error of 0.07158341.
+```{r}
+dep_results <- boot(data=student_mh, statistic=acc_dep,R=1000, formula=Depression ~ .)
+dep_results
+```
+
+```{r}
+plot(dep_results)
+```
+
+
+Looking at the distribution of prediction accuarcies, it seems to follow a normal distribution where predictions of about 0.8 had the highest frequency. There are few outliers with acuracies lower than 0.6 and others that were near 1.
+```{r}
+plot(dep_results)
+```
+
+To account for our outliers, we'll utilize a 95% confidence interval that gives us (0.5556,0.8750).
+```{r}
+boot.ci(dep_results, type="bca")
+```
+
+Moving on to bootstrap sampling of anxiety prediction accuracies
+```{r}
+acc_anx <- function(formula, data, i) {
+  data_anx <- data[i,]
+  anx_split <- initial_split(data_anx, prop = 0.7, strata = Anxiety)
+  anx_train <- training(anx_split)
+  anx_test <- testing(anx_split)
+  
+  anx_recipe <- recipe(Anxiety ~ ., anx_train) %>%
+    step_rm(Major) %>%
+    step_rm(Depression) %>%
+    step_dummy(all_nominal_predictors())
+
+  anx_wf <- workflow() %>% 
+    add_model(log_reg) %>% 
+    add_recipe(anx_recipe)
+
+  fit <- fit(anx_wf, anx_train)
+
+  pred_anx <- predict(fit, new_data = anx_test, type = "class") %>% 
+    bind_cols(anx_test) 
+
+  acc_anx <- pred_anx %>% accuracy(truth = Anxiety, estimate = .pred_class)
+  
+  return (acc_anx[3] %>% as.numeric())
+}
+```
+
+The data given gives low prediction accuracy for anxiety when we bootstrap for logestic regression. 
+Accuracy rate is 0.5666667 with bias of 0.06373458 and std. error of 0.09111097.
+```{r}
+anx_results <- boot(data=student_mh, statistic=acc_anx,R=1000, formula=Anxiety ~ .)
+anx_results
+
+plot(anx_results)
+```
+
+The 95% confidence interval is (0.3333,  0.6774).
+```{r}
+boot.ci(anx_results, type="bca")
+```
