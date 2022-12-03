@@ -24,3 +24,4 @@ What we will be doing is taking many bootstrap samples from a dataset comprised 
 
 -  https://www.tidymodels.org/learn/statistics/bootstrap/
 -  https://link.springer.com/article/10.1007/s13278-021-00760-0
+-  https://www.kaggle.com/datasets/shariful07/student-mental-health

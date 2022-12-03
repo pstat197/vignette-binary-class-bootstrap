@@ -1,0 +1,28 @@
+---
+title: "Application of Bootstrap Resampling on Student Mental Health Data"
+subtitle: "Bootstrapping for Binary Classification Models"
+author: "Luke Fields, Thomas Shi, Lily Li, Dingan Jiang"
+date: last-modified
+published-title: "Updated"
+editor: visual
+format: html
+code-copy: true
+execute:
+  message: false
+  warning: false
+  echo: false
+  cache: true
+---
+
+## Summary
+
+## Preprocessing, Outliers, and Data Findings
+Binary categorical variables were factorized, survey timestamp was removed, and year was converted to a numeric variable. Stratified sampling was done for data splits due to imbalance in our outcome variables; in other words, less students reported having mental illness or reported seeking help. Survey data shows that underclassment were surveyed more than upperclassmen and had higher rates of mental illness compared to upperclassmen.
+
+## Application of Bootstrapping
+
+## Results and Confidence Intervals
+
+## Tree Models
+
+## Final Remarks
