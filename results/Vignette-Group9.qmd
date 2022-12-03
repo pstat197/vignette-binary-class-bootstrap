@@ -13,15 +13,22 @@ execute:
   echo: false
   cache: true
 ---
+*****DRAFT IN PROGRESS*****
 
 ## Summary
 
 ## Preprocessing, Outliers, and Data Findings
-Binary categorical variables were factorized, survey timestamp was removed, and year was converted to a numeric variable. Stratified sampling was done for data splits due to imbalance in our outcome variables; in other words, less students reported having mental illness or reported seeking help. Survey data shows that underclassment were surveyed more than upperclassmen and had higher rates of mental illness compared to upperclassmen.
+Binary categorical variables were factorized, survey timestamp was removed, and year was converted to a numeric variable. Stratified sampling was done for data splits due to imbalance in our outcome variables; in other words, less students reported having mental illness or reported seeking help. Survey data shows that underclassmen were surveyed more than upperclassmen and had higher rates of mental illness compared to upperclassmen.
 
 ## Application of Bootstrapping
+Since we have a small dataset, we can not sample without replacement since this would decrease our population size for subsequent samples and increase bias. Thus we can use bootstrapping to get a better representation of our data for analysis of shape, variance, coeeficents, and confidence intervals. By sampling with replacement, we can infer metrics on the population.
 
 ## Results and Confidence Intervals
+We are using 1000 bootstrap samples to provide a 95% confidence interval of prediction accuracies of students with mental illness. By providing a confidence interval, we get an averaged prediction accuracy from 1000 samples that is less bias, and we are able to see a wide range that our prediction accuracy can stretch from. Random forests and other bagging methods utilize bootstrap methods in their algorithms to take take subsets of data with replacement. Therefore, we can try bootstraping to get a better understanding of metrics using other models (logistic regression in this case). On depresion, bootstrapping with 1000 replications gives us an accuracy of 0.8, bias of 0.02677731, and std. error of 0.07158341. Looking at the distribution of prediction accuarcies, it seems to follow a normal distribution where predictions of about 0.8 had the highest frequency. There are few outliers with acuracies lower than 0.6 and others that were near 1. The data given gives low prediction accuracy for anxiety when we bootstrap for logestic regression. 
+Accuracy rate is 0.5666667 with bias of 0.06373458 and std. error of 0.09111097. The 95 % CI is (0.3333,  0.6774). 
+
+**IN PROGRESS OF FINDING A STRONGER MODEL FOR THE ANXIETY DATA**
+
 
 ## Tree Models
 
