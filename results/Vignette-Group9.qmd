@@ -18,13 +18,36 @@ execute:
 
 ## Summary
 
-## Importance of Mental Health 
+## Importance of Mental Health
 
 Before we delve into the specific code and models we implemented to describe the importance of bootstrapping, we probably should talk about the importance of our data set. We all feel quite passionately about the importance of mental health within UCSB students, and what better way to gain more insight on such a critical topic than to analyze it with Data Science techniques. Certain students may be experiencing untreated mental health problems without even knowing, and their friends, family, and especially self might want to be aware of this so they can improve their condition. How awesome would it be if we could leverage machine learning and statistical models to provide some positive assistance to the mental health issue in today's college students? That is what we aim to do in this vignette, but there lies an issue: we do not have a lot of data.
 
 ## Preprocessing, Outliers, and Data Findings
 
 Binary categorical variables were factorized, survey timestamp was removed, and year was converted to a numeric variable. Stratified sampling was done for data splits due to imbalance in our outcome variables; in other words, less students reported having mental illness or reported seeking help. Survey data shows that underclassmen were surveyed more than upperclassmen and had higher rates of mental illness compared to upperclassmen.
+
+## Exploratory Data Analysis
+
+![](images/anxiety.png)
+
+The graph shows that the majority of students have GPA between 3.00 and 4.00. Students who respond that they suffer from anxiety do not have a low gap. As a result, we can infer that there isn't much of a connection between anxiety and a high or low GPA.
+
+![](images/depression.png)
+
+Students who reported having depression also revealed the same result. These GPA-high students experience depression as well. We can suggest that there is also no strong relationship between depression and GPAs. Other elements, such as interactions with family or friends, the stress of maintaining a student budget and living expenses, and the pressure of looking for internships and jobs, can contribute to depression and anxiety.
+
+![](images/depression_age.png)\
+![](images/anxiety_age-01.png)
+
+Two graphs above show density distribution by age for anxiety and depression. Graphs capture the same pattern as a U shape, and the number of people aged 18 and 24 indicating anxiety and depression are the most. There is a observation that could account for this phenomenon. Freshmen may feel uneasy in their new environment because they are unfamiliar with university policies and programs.
+
+![![](images/year2.png)](images/year1.png)
+
+School year frequency also shows the same rule for depression and anxiety. The number of students replying to have depression and anxiety increases from year one and raise to peaks in year three. ​​Finding a full-time job and applying to graduate programs may put pressure on junior students. This may explain why junior students have the largest group of students having depression or anxiety.
+
+Below is the correlation plot between each variable
+
+![](images/corrplot.png)
 
 ## Application of Bootstrapping
 
