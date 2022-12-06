@@ -2,7 +2,6 @@
 title: "Application of Bootstrap Resampling on Student Mental Health Data"
 subtitle: "Bootstrapping for Binary Classification Models"
 author: "Luke Fields, Thomas Shi, Lily Li, Dingan Jiang"
-date: last-modified
 published-title: "Updated"
 editor: visual
 format: html
@@ -13,10 +12,6 @@ execute:
   echo: false
   cache: true
 ---
-
-\*\*\*\*\*DRAFT IN PROGRESS\*\*\*\*\*
-
-## Summary
 
 ## Importance of Mental Health
 
@@ -51,14 +46,14 @@ Below is the correlation plot between each variable
 
 ## Application of Bootstrapping
 
-Since we have a small dataset, we can not sample without replacement since this would decrease our population size for subsequent samples and increase bias. Thus we can use bootstrapping to get a better representation of our data for analysis of shape, variance, coeeficents, and confidence intervals. By sampling with replacement, we can infer metrics on the population.
+Since we have a small dataset, we can not sample without replacement since this would decrease our population size for subsequent samples and increase bias. Thus we can use bootstrapping to get a better representation of our data for analysis of shape, variance, coeeficents, and confidence intervals. By sampling with replacement, we can infer metrics on the population with reduced error.
 
 ## Results and Confidence Intervals
 
-We are using 1000 bootstrap samples to provide a 95% confidence interval of prediction accuracies of students with mental illness. By providing a confidence interval, we get an averaged prediction accuracy from 1000 samples that is less bias, and we are able to see a wide range that our prediction accuracy can stretch from. Random forests and other bagging methods utilize bootstrap methods in their algorithms to take take subsets of data with replacement. Therefore, we can try bootstraping to get a better understanding of metrics using other models (logistic regression in this case). On depresion, bootstrapping with 1000 replications gives us an accuracy of 0.8, bias of 0.02677731, and std. error of 0.07158341. Looking at the distribution of prediction accuarcies, it seems to follow a normal distribution where predictions of about 0.8 had the highest frequency. There are few outliers with acuracies lower than 0.6 and others that were near 1. The data given gives low prediction accuracy for anxiety when we bootstrap for logestic regression. Accuracy rate is 0.5666667 with bias of 0.06373458 and std. error of 0.09111097. The 95 % CI is (0.3333, 0.6774).
-
-**IN PROGRESS OF FINDING A STRONGER MODEL FOR THE ANXIETY DATA**
+We are using 1000 bootstrap samples to provide a 95% confidence interval of prediction accuracies of students with mental illness. By providing a confidence interval, we get an averaged prediction accuracy from 1000 samples that is less bias, and we are able to see a wide range that our prediction accuracy can stretch from. Random forests and other bagging methods utilize bootstrap methods in their algorithms to take take subsets of data with replacement. Therefore, we can try bootstraping to get a better understanding of metrics using other models (logistic regression in this case). On depresion, bootstrapping with 1000 replications gives us an accuracy of 0.8, bias of 0.02677731, and std. error of 0.07158341. Looking at the distribution of prediction accuarcies, it seems to follow a normal distribution where predictions of about 0.8 had the highest frequency. There are few outliers with acuracies lower than 0.6 and others that were near 1. The data given gives low prediction accuracy for anxiety, possibly due to the difficulty of predicting thir outcome with the survey data we have. Accuracy rate is 0.5666667 with bias of 0.06373458 and std. error of 0.09111097. The 95 % CI is (0.3333, 0.6774).
 
 ## Tree Models
+Using bootstrapping in boosted trees, depression predictions have 0.7808617 accuracy and ROC AUC = 0.7792286, which tells us that the model was able to use the data to distinguish between binary classes with moderate strength. Once again, anxiety has proven to be difficult t o predict with a 0.5558013 accuracy and ROC AUC = 0.4604968, indicating that the model can not distinguish between binary classes with our data.
 
 ## Final Remarks
+While more data trains a stronger model, some situations make it difficult to collect usable and reliable data. Reusing the data over and over again for collecting accurate metrics almost sounds too good to be true. By utilizing bootstrap resampling on student-collected data and making little assumptions about the distribution, we have proven that depression can be predicted with a moderately strong accuracy. Thus, an application like this would benefit universities in addressing mental health concerns.
