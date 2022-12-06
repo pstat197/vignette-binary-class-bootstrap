@@ -13,7 +13,7 @@ library(tidyverse)
 ```
 
 ```{r}
-student_mh <- read_csv("student_mental_health.csv")
+student_mh <- read_csv("/Users/dinganjiang/Desktop/pstat197/vignette-binary-class-bootstrap/data/student_mental_health.csv")
 
 student_mh <- select(student_mh, -Timestamp)
 student_mh$Year <- str_sub(student_mh$Year, -1)
@@ -34,7 +34,7 @@ student_mh
 
 ```{r}
 # barplot
-student_mh %>%
+graph_depression <- student_mh %>%
   ggplot(aes(x = Year, y=GPA, fill=GPA)) +
   geom_bar(stat = "identity", width=0.8) +
   # scale_x_continuous(limits=c(20, 80)) +
@@ -44,6 +44,8 @@ student_mh %>%
   facet_wrap(~Depression)+
   theme_minimal()
 ```
+
+
 
 ```{r}
 student_mh %>%
@@ -60,7 +62,7 @@ student_mh %>%
 
 ```{r}
 student_mh %>%
-    ggplot(aes(x = Age, fill = Anxiety )) +
+    ggplot(aes(x = Age, fill = Depression )) +
     geom_density(alpha = 0.4) +
     labs(title = "Depression destribution by age",
   fill = "Depression",
@@ -68,9 +70,21 @@ student_mh %>%
   y = "Density") + ## and now add labels to each argument of the aes
 theme_minimal()
 ```
+```{r}
+student_mh %>%
+    ggplot(aes(x = Age, fill = Anxiety)) +
+    geom_density(alpha = 0.4) +
+    labs(title = "Anxiety destribution by age",
+  fill = "Anxiety",
+  x = "Age",
+  y = "Density") + ## and now add labels to each argument of the aes
+theme_minimal()
+```
+
+
 
 ```{r}
-# corrlation plot
+# corrplot 
 library(ggcorrplot)
 student_mh1 <- student_mh %>% 
   select(Year,Married,Depression,Anxiety,Panic_Attack,Seek_Help)
