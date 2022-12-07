@@ -7,9 +7,10 @@ editor: visual
 format:
   html:
     code-fold: true
+    code-tools: true
 ---
 
-```{r}
+```{r, results="hide"}
 # We will be using the tidyverse models for this vignette
 # We will also use the boot library for our bootstrapping
 library(boot) 
@@ -21,9 +22,9 @@ library(tidymodels)
 
 Before we delve into the specific code and models we implemented to describe the importance of bootstrapping, we probably should talk about the importance of our data set. We all feel quite passionately about the importance of mental health within UCSB students, and what better way to gain more insight on such a critical topic than to analyze it with Data Science techniques. Certain students may be experiencing untreated mental health problems without even knowing, and their friends, family, and especially self might want to be aware of this so they can improve their condition. How awesome would it be if we could leverage machine learning and statistical models to provide some positive assistance to the mental health issue in today's college students? That is what we aim to do in this vignette, but there lies an issue: we did not have a lot of data.
 
-![](images/paste-4835C77D.png){width="273"}
+![](images/paste-4835C77D.png){width="440"}
 
-[Image 1](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.theguardian.com%2Fsociety%2F2019%2Fsep%2F27%2Fanxiety-mental-breakdowns-depression-uk-students&psig=AOvVaw31twejv8dhQag9lEZk4CmH&ust=1670457602735000&source=images&cd=vfe&ved=0CA8QjRxqFwoTCICR9tCZ5vsCFQAAAAAdAAAAABAE) Source
+[Image 1 Source](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.theguardian.com%2Fsociety%2F2019%2Fsep%2F27%2Fanxiety-mental-breakdowns-depression-uk-students&psig=AOvVaw31twejv8dhQag9lEZk4CmH&ust=1670457602735000&source=images&cd=vfe&ved=0CA8QjRxqFwoTCICR9tCZ5vsCFQAAAAAdAAAAABAE)
 
 ## Prepping the Bootstrap
 
@@ -38,19 +39,22 @@ student_mh <- student_mh %>%
          Anxiety = factor(Anxiety, levels = c("Yes", "No")),
          Panic_Attack = factor(Panic_Attack, levels = c("Yes", "No")),
          Seek_Help = factor(Seek_Help, levels = c("Yes", "No")),)
+
+student_mh %>%
+  head()  # Let's take a peak at our dataset
 ```
 
 ![](images/paste-32C62A3A.png){width="236"}
 
-[Image 2](https://thehustle.co/wp-content/uploads/2021/12/header-1.gif) Source
+[Image 2 Source](https://thehustle.co/wp-content/uploads/2021/12/header-1.gif)
 
 Now, we get to our actual goal of this project. Typically, bootstrapping is performed as a method that takes many different random samples from one sample as a whole when not enough data is available. That original sample is treated as the population in this scenario, and our new samples are each treated as individual ones from this "population". This is usually done to obtain a certain estimate with a higher degree of confidence. For example, if we only had a sample of 1000 students but wanted to measure the mean `Age` of students in a 30,000+ student University, then bootstrapping that original 1000 student sample over and over can provide us with more detail of how things tend to settle at a certain estimate. Since we have a small data set, we can not sample without replacement since this would decrease our population size for subsequent samples and increase bias. A good visualization of the overall bootstrap process can be seen below.
 
-![](images/paste-321100E3.png){width="225"}
+![](images/paste-321100E3.png){width="491"}
 
 But, this is where the fun part comes in, which is the objective of our project. As previously stated, most bootstrapping is done to obtain an estimate or confidence interval of a certain parameter, like *median* or *maximum*. Our group, on the other hand, wanted to demonstrate a bootstrapped estimate of **accuracy**; in this case binary classification accuracy that measures how well our model was able to correctly predict a student having depression or anxiety. Building a single train/test model on a sample with only 100 observations is not going to yield deployable results, but perhaps if our model was consistently working well on the bootstrapping methods, it could be more implementable among college kids. A diagram of how our specific bootstrapping process will be performed can be seen below.
 
-![Visualization of Our Bootstrap Process](images/bootstrap-pre-viz.jpg){width="287"}
+![Visualization of Our Bootstrap Process](images/bootstrap-pre-viz.jpg){width="477"}
 
 ## Exploratory Data Analysis
 
@@ -76,6 +80,47 @@ School year frequency also shows the same rule for depression and anxiety. The n
 Below is the correlation plot between each variable
 
 ![](images/corrplot.png)
+
+## Example of our Model
+
+Before we bootstrap across 1000 different samples, it might be cool to see how our model works. Take Group 9 Member Luke for example. He is a 21 year old male, fourth year, statistics major with a GPA ranging from 3.50-4.00. Along with the rest of the predictors, does our model predict that he is depressed?
+
+![](images/luke_ex_pic.jpeg){width="374"}
+
+```{r}
+set.seed(27)
+luke_info <- c("Male", 21, "Statistics", 4, "3.50 - 4.00", "No", "No", "Yes", "Yes", "No")
+
+student_mh_w_luke <- rbind(student_mh, luke_info)
+
+dep_split <- initial_split(student_mh_w_luke, prop = 0.7, strata = Depression)
+  dep_train <- training(dep_split)
+  dep_test <- testing(dep_split)
+  
+dep_recipe <- recipe(Depression ~ ., dep_train) %>%
+  step_rm(Major) %>%
+  step_rm(Anxiety) %>%
+  step_dummy(all_nominal_predictors())
+
+log_reg <- logistic_reg() %>% 
+    set_engine("glm") %>% 
+    set_mode("classification")
+
+dep_wf <- workflow() %>% 
+  add_model(log_reg) %>% 
+  add_recipe(dep_recipe)
+
+fit <- fit(dep_wf, dep_train)
+
+pred_dep <- predict(fit, new_data = dep_test, type = "class") %>% 
+  bind_cols(dep_test) %>%
+  rename(Pred_Dep = .pred_class)
+
+pred_dep %>%
+  tail(n = 1)
+```
+
+No, it predicts that he is not depressed! Maybe our model has some sort of hidden image recognition because of that smile! All jokes aside, this is just one student with one set of information, and our model obviously needs a lot more if the bootstrap is going to work to the desired effect.
 
 ## Results and Confidence Intervals
 
@@ -157,4 +202,4 @@ While more data trains a stronger model, some situations make it difficult to co
 
 ![](images/paste-D819E233.png)
 
-[Image 3](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.zevohealth.com%2Fblog%2F6-ways-to-improve-employee-mental-health%2F&psig=AOvVaw0wxwIWH-GtIxCMO3lgskld&ust=1670464914696000&source=images&cd=vfe&ved=0CA8QjRxqFwoTCIiK2e-05vsCFQAAAAAdAAAAABAE) Source
+[Image 3 Source](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.zevohealth.com%2Fblog%2F6-ways-to-improve-employee-mental-health%2F&psig=AOvVaw0wxwIWH-GtIxCMO3lgskld&ust=1670464914696000&source=images&cd=vfe&ved=0CA8QjRxqFwoTCIiK2e-05vsCFQAAAAAdAAAAABAE)
