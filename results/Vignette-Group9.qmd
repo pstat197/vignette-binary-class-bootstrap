@@ -124,73 +124,20 @@ No, it predicts that he is not depressed! Maybe our model has some sort of hidde
 
 ## Results and Confidence Intervals
 
-Depression code chunk
-
+We are using 1000 bootstrap samples to provide a 95% confidence interval of prediction accuracies of students with mental illness. By providing a confidence interval, we get an averaged prediction accuracy from 1000 samples that has less bias, and we are able to see a wide range that our prediction accuracy can stretch from. Random forests and other bagging methods utilize bootstrap methods in their algorithms to take take subsets of data with replacement. Therefore, we can try bootstraping to get a better understanding of metrics using other models (logistic regression in this case). Our accuracy when bootrapping with deepression as outcome variable: 
 ```{r}
-# acc_dep <- function(formula, data, i) {
-#   data_dep <- data[i,]
-#   dep_split <- initial_split(data_dep, prop = 0.7, strata = Depression)
-#   dep_train <- training(dep_split)
-#   dep_test <- testing(dep_split)
-#   
-#   dep_recipe <- recipe(Depression ~ ., dep_train) %>%
-#     step_rm(Major) %>%
-#     step_rm(Anxiety) %>%
-#     step_dummy(all_nominal_predictors())
-# 
-#   dep_wf <- workflow() %>% 
-#     add_model(log_reg) %>% 
-#     add_recipe(dep_recipe)
-# 
-#   fit <- fit(dep_wf, dep_train)
-# 
-#   pred_dep <- predict(fit, new_data = dep_test, type = "class") %>% 
-#     bind_cols(dep_test) 
-# 
-#   acc_dep <- pred_dep %>% accuracy(truth = Depression, estimate = .pred_class)
-#   
-#   return (acc_dep[3] %>% as.numeric())
-# }
-# 
-# dep_results <- boot(data=student_mh, statistic=acc_dep,R=1000, formula=Depression ~ .)
-# 
-# boot.ci(dep_results, type="bca")
+load(file="~/Desktop/PSTAT 197A/vignette-binary-class-bootstrap/data/fit_CI_results.rda")
+boot.ci(dep_results, type="bca")
+plot(dep_results)
 ```
 
-Anxiety code chunk
-
+Looking at the distribution of prediction accuarcies, it seems to follow a normal distribution where predictions of about 0.8 had the highest frequency. There are few outliers with acuracies lower than 0.6 and others that were near 1. The data given gives low prediction accuracy for anxiety, possibly due to the difficulty of predicting thir outcome with the survey data we have. Accuarcy rates when boostrapping with anxiety as outcome variable:
 ```{r}
-# acc_anx <- function(formula, data, i){
-#   data_anx <- data[i,]
-#   anx_split <- initial_split(data_anx, prop = 0.7, strata = Anxiety)
-#   anx_train <- training(anx_split)
-#   anx_test <- testing(anx_split)
-#   
-#   anx_recipe <- recipe(Anxiety ~ ., anx_train) %>%
-#     step_rm(Major) %>%
-#     step_rm(Depression) %>%
-#     step_dummy(all_nominal_predictors())
-# 
-#   anx_wf <- workflow() %>% 
-#     add_model(log_reg) %>% 
-#     add_recipe(anx_recipe)
-# 
-#   fit <- fit(anx_wf, anx_train)
-# 
-#   pred_anx <- predict(fit, new_data = anx_test, type = "class") %>% 
-#     bind_cols(anx_test) 
-# 
-#   acc_anx <- pred_anx %>% accuracy(truth = Anxiety, estimate = .pred_class)
-#   
-#   return (acc_anx[3] %>% as.numeric())
-# }
-# 
-# anx_results <- boot(data=student_mh, statistic=acc_anx,R=1000, formula=Anxiety ~ .)
-# 
-# boot.ci(anx_results, type="bca")
+boot.ci(anx_results, type="bca")
+plot(anx_results)
 ```
 
-We are using 1000 bootstrap samples to provide a 95% confidence interval of prediction accuracies of students with mental illness. By providing a confidence interval, we get an averaged prediction accuracy from 1000 samples that has less bias, and we are able to see a wide range that our prediction accuracy can stretch from. Random forests and other bagging methods utilize bootstrap methods in their algorithms to take take subsets of data with replacement. Therefore, we can try bootstraping to get a better understanding of metrics using other models (logistic regression in this case). On depresion, bootstrapping with 1000 replications gives us an accuracy of 0.8, bias of 0.02677731, and std. error of 0.07158341. Looking at the distribution of prediction accuarcies, it seems to follow a normal distribution where predictions of about 0.8 had the highest frequency. There are few outliers with acuracies lower than 0.6 and others that were near 1. The data given gives low prediction accuracy for anxiety, possibly due to the difficulty of predicting thir outcome with the survey data we have. Accuracy rate is 0.5666667 with bias of 0.06373458 and std. error of 0.09111097. The 95 % CI is (0.3333, 0.6774).
+
 
 ## Tree Models
 

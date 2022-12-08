@@ -105,3 +105,8 @@ The 95% confidence interval is (0.3333,  0.6774).
 boot.ci(anx_results, type="bca")
 ```
 
+Save results
+```{r}
+save(dep_results, anx_results, file="~/Desktop/PSTAT 197A/vignette-binary-class-bootstrap/data/fit_CI_results.rda")
+```
+
